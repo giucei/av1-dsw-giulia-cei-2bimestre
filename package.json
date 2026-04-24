@@ -22,7 +22,9 @@
   "homepage": "https://github.com/h-fcosta/js-basico#readme",
   "description": "",
   "dependencies": {
-    "express": "^5.2.1"
+    "@prisma/client": "^7.7.0",
+    "express": "^5.2.1",
+    "prisma": "^7.7.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
