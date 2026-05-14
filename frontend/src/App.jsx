@@ -1,122 +1,94 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+
+import { useEffect, useState } from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [tarefas, setTarefas] = useState([]);
+  const [descricao, setDescricao] = useState("");
+
+  // Buscar tarefas da API
+  async function carregarTarefas() {
+    try {
+      const resposta = await fetch("http://localhost:3000/tarefas");
+      const dados = await resposta.json();
+      setTarefas(dados);
+    } catch (erro) {
+      console.error("Erro ao buscar tarefas:", erro);
+    }
+  }
+
+  // Criar tarefa
+  async function criarTarefa(e) {
+    e.preventDefault();
+
+    if (!descricao.trim()) return;
+
+    try {
+      await fetch("http://localhost:3000/tarefas", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: descricao,
+          description: descricao,
+        }),
+      });
+
+      setDescricao("");
+      carregarTarefas();
+    } catch (erro) {
+      console.error("Erro ao criar tarefa:", erro);
+    }
+  }
+
+  // Excluir tarefa
+  async function excluirTarefa(id) {
+    try {
+      await fetch(`http://localhost:3000/tarefas/${id}`, {
+        method: "DELETE",
+      });
+
+      carregarTarefas();
+    } catch (erro) {
+      console.error("Erro ao excluir tarefa:", erro);
+    }
+  }
+
+  useEffect(() => {
+    carregarTarefas();
+  }, []);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div style={{ padding: "20px", fontFamily: "Arial" }}>
+      <h1>Lista de Tarefas</h1>
 
-      <div className="ticks"></div>
+      <form onSubmit={criarTarefa}>
+        <input
+          type="text"
+          placeholder="Digite uma tarefa"
+          value={descricao}
+          onChange={(e) => setDescricao(e.target.value)}
+        />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        <button type="submit">Adicionar</button>
+      </form>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <ul>
+        {tarefas.map((tarefa) => (
+          <li key={tarefa.id}>
+            {tarefa.description}
+
+            <button
+              onClick={() => excluirTarefa(tarefa.id)}
+              style={{ marginLeft: "10px" }}
+            >
+              Excluir
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
-export default App
+export default App;
