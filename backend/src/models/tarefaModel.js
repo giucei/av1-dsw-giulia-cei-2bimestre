@@ -1,89 +1,68 @@
 // ========================================
 // MODEL - CAMADA DE DADOS COM PRISMA
 // ========================================
-// Esta camada é responsável por:
-// - Comunicação com o banco de dados
-// - Operações CRUD usando Prisma ORM
-// - Manipulação dos dados da entidade Task
 
 import prisma from "../config/prisma.js";
 
 /**
- * Retorna todas as tarefas cadastradas
- * @returns {Promise<Array>}
+ * Retorna todas as tarefas
  */
 export async function obterTodasTarefas() {
-  return await prisma.task.findMany({
-    include: {
-      category: true
-    }
-  });
+  return await prisma.task.findMany();
 }
 
 /**
- * Busca uma tarefa específica pelo ID
- * @param {number} id
- * @returns {Promise<Object|null>}
+ * Busca tarefa por ID
  */
 export async function obterTarefaPorId(id) {
   return await prisma.task.findUnique({
     where: {
       id
-    },
-    include: {
-      category: true
     }
   });
 }
 
 /**
- * Cria uma nova tarefa
- * @param {string} descricao
- * @returns {Promise<Object>}
+ * Cria nova tarefa
  */
 export async function criarNovaTarefa(descricao) {
   return await prisma.task.create({
     data: {
-      title: descricao.trim(),
-      description: descricao.trim(),
+      title: descricao,
+      description: descricao,
       completed: false
     }
   });
 }
 
 /**
- * Atualiza uma tarefa existente
- * @param {number} id
- * @param {string} novaDescricao
- * @param {boolean} novoStatus
- * @returns {Promise<Object|null>}
+ * Atualiza tarefa
  */
-export async function atualizarTarefa(id, novaDescricao, novoStatus) {
+export async function atualizarTarefa(id, descricao, concluida) {
   try {
     return await prisma.task.update({
       where: {
         id
       },
       data: {
-        ...(novaDescricao !== undefined && {
-          description: novaDescricao.trim(),
-          title: novaDescricao.trim()
+        ...(descricao !== undefined && {
+          title: descricao,
+          description: descricao
         }),
 
-        ...(novoStatus !== undefined && {
-          completed: novoStatus
+        ...(concluida !== undefined && {
+          completed: concluida
         })
       }
     });
-  } catch (error) {
+
+  } catch (erro) {
     return null;
   }
 }
 
 /**
- * Exclui uma tarefa pelo ID
- * @param {number} id
- * @returns {Promise<Object|null>}
+ * Exclui tarefa
  */
 export async function excluirTarefa(id) {
   try {
@@ -92,7 +71,8 @@ export async function excluirTarefa(id) {
         id
       }
     });
-  } catch (error) {
+
+  } catch (erro) {
     return null;
   }
 }

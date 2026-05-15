@@ -2,22 +2,22 @@
 import { useEffect, useState } from "react";
 
 function App() {
-  const [tarefas, setTarefas] = useState([]);
+  const [series, setSeries] = useState([]);
   const [descricao, setDescricao] = useState("");
 
-  // Buscar tarefas da API
-  async function carregarTarefas() {
+  async function carregarSeries() {
     try {
       const resposta = await fetch("http://localhost:3000/tarefas");
       const dados = await resposta.json();
-      setTarefas(dados);
+
+      setSeries(dados);
+
     } catch (erro) {
-      console.error("Erro ao buscar tarefas:", erro);
+      console.error(erro);
     }
   }
 
-  // Criar tarefa
-  async function criarTarefa(e) {
+  async function adicionarSerie(e) {
     e.preventDefault();
 
     if (!descricao.trim()) return;
@@ -29,64 +29,138 @@ function App() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: descricao,
-          description: descricao,
+          descricao,
         }),
       });
 
       setDescricao("");
-      carregarTarefas();
+      carregarSeries();
+
     } catch (erro) {
-      console.error("Erro ao criar tarefa:", erro);
+      console.error(erro);
     }
   }
 
-  // Excluir tarefa
-  async function excluirTarefa(id) {
+  async function excluirSerie(id) {
     try {
       await fetch(`http://localhost:3000/tarefas/${id}`, {
         method: "DELETE",
       });
 
-      carregarTarefas();
+      carregarSeries();
+
     } catch (erro) {
-      console.error("Erro ao excluir tarefa:", erro);
+      console.error(erro);
     }
   }
 
   useEffect(() => {
-    carregarTarefas();
+    carregarSeries();
   }, []);
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial" }}>
-      <h1>Lista de Tarefas</h1>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(to right, #ffdde1, #ee9ca7)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        fontFamily: "Arial"
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "white",
+          padding: "35px",
+          borderRadius: "20px",
+          width: "450px",
+          boxShadow: "0 8px 20px rgba(0,0,0,0.15)"
+        }}
+      >
+        <h1
+          style={{
+            textAlign: "center",
+            color: "#d63384",
+            marginBottom: "25px"
+          }}
+        >
+          🎬 Lista de Séries
+        </h1>
 
-      <form onSubmit={criarTarefa}>
-        <input
-          type="text"
-          placeholder="Digite uma tarefa"
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
-        />
+        <form
+          onSubmit={adicionarSerie}
+          style={{
+            display: "flex",
+            gap: "10px",
+            marginBottom: "25px"
+          }}
+        >
+          <input
+            type="text"
+            placeholder="Digite uma série"
+            value={descricao}
+            onChange={(e) => setDescricao(e.target.value)}
+            style={{
+              flex: 1,
+              padding: "12px",
+              borderRadius: "10px",
+              border: "2px solid #f8bbd0",
+              outline: "none"
+            }}
+          />
 
-        <button type="submit">Adicionar</button>
-      </form>
+          <button
+            type="submit"
+            style={{
+              backgroundColor: "#ff4d8d",
+              color: "white",
+              border: "none",
+              padding: "12px 18px",
+              borderRadius: "10px",
+              cursor: "pointer",
+              fontWeight: "bold"
+            }}
+          >
+            Adicionar
+          </button>
+        </form>
 
-      <ul>
-        {tarefas.map((tarefa) => (
-          <li key={tarefa.id}>
-            {tarefa.description}
-
-            <button
-              onClick={() => excluirTarefa(tarefa.id)}
-              style={{ marginLeft: "10px" }}
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {series.map((serie) => (
+            <li
+              key={serie.id}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                backgroundColor: "#fff0f5",
+                padding: "12px",
+                borderRadius: "10px",
+                marginBottom: "12px"
+              }}
             >
-              Excluir
-            </button>
-          </li>
-        ))}
-      </ul>
+              <span style={{ color: "#444", fontWeight: "500" }}>
+                🍿 {serie.title}
+              </span>
+
+              <button
+                onClick={() => excluirSerie(serie.id)}
+                style={{
+                  backgroundColor: "#ff6b81",
+                  color: "white",
+                  border: "none",
+                  padding: "7px 12px",
+                  borderRadius: "8px",
+                  cursor: "pointer"
+                }}
+              >
+                Excluir
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
