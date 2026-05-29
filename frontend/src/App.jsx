@@ -6,17 +6,20 @@ function App() {
   const [tarefas, setTarefas] = useState([]);
   const [descricao, setDescricao] = useState("");
 
+  // CARREGAR FILMES/SÉRIES
   async function carregarTarefas() {
     try {
       const resposta = await fetch("http://localhost:3000/tarefas");
+
       const dados = await resposta.json();
 
       setTarefas(dados);
     } catch (erro) {
-      console.error(erro);
+      console.error("Erro ao carregar:", erro);
     }
   }
 
+  // ADICIONAR
   async function criarTarefa(e) {
     e.preventDefault();
 
@@ -25,9 +28,11 @@ function App() {
     try {
       await fetch("http://localhost:3000/tarefas", {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify({
           title: descricao,
           description: descricao,
@@ -35,12 +40,14 @@ function App() {
       });
 
       setDescricao("");
+
       carregarTarefas();
     } catch (erro) {
-      console.error(erro);
+      console.error("Erro ao criar:", erro);
     }
   }
 
+  // REMOVER
   async function excluirTarefa(id) {
     try {
       await fetch(`http://localhost:3000/tarefas/${id}`, {
@@ -49,7 +56,7 @@ function App() {
 
       carregarTarefas();
     } catch (erro) {
-      console.error(erro);
+      console.error("Erro ao excluir:", erro);
     }
   }
 
@@ -60,7 +67,10 @@ function App() {
   return (
     <div className="app">
 
+      {/* NAVBAR */}
+
       <header className="navbar">
+
         <h1>🎬 CineVerse</h1>
 
         <div className="nav-links">
@@ -68,7 +78,10 @@ function App() {
           <span>📺 Séries</span>
           <span>⭐ Favoritos</span>
         </div>
+
       </header>
+
+      {/* HERO */}
 
       <section className="hero">
 
@@ -85,9 +98,12 @@ function App() {
           </h2>
 
           <p>
-            Adicione títulos à sua lista e monte
-            sua própria plataforma de streaming.
+            Adicione filmes e séries à sua lista
+            e transforme seu catálogo pessoal
+            em uma experiência de streaming moderna.
           </p>
+
+          {/* FORM */}
 
           <form onSubmit={criarTarefa}>
 
@@ -106,13 +122,17 @@ function App() {
 
         </div>
 
+        {/* CARD INTERSTELLAR */}
+
         <div className="hero-card">
 
           <span className="trend">
             🔥 Em alta no momento
           </span>
 
-          <h3>🚀 Interstellar</h3>
+          <h3>
+            🚀 Interstellar
+          </h3>
 
           <p className="movie-desc">
             Uma jornada épica pelo espaço,
@@ -128,6 +148,8 @@ function App() {
 
       </section>
 
+      {/* LISTA */}
+
       <section className="lista">
 
         <h2>🍿 Minha Watchlist</h2>
@@ -142,7 +164,9 @@ function App() {
 
               <div className="card-content">
 
-                <h3>{tarefa.title}</h3>
+                <h3>
+                  {tarefa.title}
+                </h3>
 
                 <p>
                   🎬 Adicionado à sua lista
