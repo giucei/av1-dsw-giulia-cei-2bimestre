@@ -6,55 +6,58 @@ function App() {
   const [tarefas, setTarefas] = useState([]);
   const [descricao, setDescricao] = useState("");
 
-  // CARREGAR FILMES/SÉRIES
+  // LISTAR
   async function carregarTarefas() {
     try {
       const resposta = await fetch("http://localhost:3000/tarefas");
-
       const dados = await resposta.json();
-
       setTarefas(dados);
     } catch (erro) {
-      console.error("Erro ao carregar:", erro);
+      console.error("Erro ao carregar tarefas:", erro);
     }
   }
 
-  // ADICIONAR
+  // CRIAR
   async function criarTarefa(e) {
+    alert("CLIQUEI NO BOTÃO");
     e.preventDefault();
 
-    if (!descricao.trim()) return;
+    if (!descricao.trim()) {
+      alert("Digite um filme ou série!");
+      return;
+    }
 
     try {
-      await fetch("http://localhost:3000/tarefas", {
+      const resposta = await fetch("http://localhost:3000/tarefas", {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
           title: descricao,
           description: descricao,
         }),
       });
 
-      setDescricao("");
+      if (!resposta.ok) {
+        throw new Error("Erro ao criar tarefa");
+      }
 
-      carregarTarefas();
+      setDescricao("");
+      await carregarTarefas();
     } catch (erro) {
       console.error("Erro ao criar:", erro);
     }
   }
 
-  // REMOVER
+  // EXCLUIR
   async function excluirTarefa(id) {
     try {
       await fetch(`http://localhost:3000/tarefas/${id}`, {
         method: "DELETE",
       });
 
-      carregarTarefas();
+      await carregarTarefas();
     } catch (erro) {
       console.error("Erro ao excluir:", erro);
     }
@@ -66,47 +69,32 @@ function App() {
 
   return (
     <div className="app">
-
-      {/* NAVBAR */}
-
       <header className="navbar">
+        <h1 className="logo">🎬 CineVerse</h1>
 
-        <h1>🎬 CineVerse</h1>
-
-        <div className="nav-links">
+        <nav>
           <span>🍿 Filmes</span>
           <span>📺 Séries</span>
-          <span>⭐ Favoritos</span>
-        </div>
-
+          <span>⭐ Watchlist</span>
+        </nav>
       </header>
 
-      {/* HERO */}
-
       <section className="hero">
-
         <div className="hero-text">
-
-          <p className="mini-title">
-            SUA WATCHLIST FAVORITA ✨
-          </p>
+          <p className="mini-title">✨ SUA WATCHLIST FAVORITA</p>
 
           <h2>
-            Organize sua
+            Organize seus
             <br />
-            watchlist perfeita 🍿
+            filmes e séries
           </h2>
 
           <p>
-            Adicione filmes e séries à sua lista
-            e transforme seu catálogo pessoal
-            em uma experiência de streaming moderna.
+            Salve seus títulos favoritos e monte sua própria plataforma de
+            streaming pessoal.
           </p>
 
-          {/* FORM */}
-
-          <form onSubmit={criarTarefa}>
-
+          <form onSubmit={criarTarefa} className="formulario">
             <input
               type="text"
               placeholder="Digite um filme ou série..."
@@ -115,79 +103,49 @@ function App() {
             />
 
             <button type="submit">
-              Adicionar ✨
+              ➕ Adicionar
             </button>
-
           </form>
-
         </div>
 
-        {/* CARD INTERSTELLAR */}
-
         <div className="hero-card">
+          <span className="trend">🔥 Em alta</span>
 
-          <span className="trend">
-            🔥 Em alta no momento
-          </span>
+          <h3>🚀 Interstellar</h3>
 
-          <h3>
-            🚀 Interstellar
-          </h3>
-
-          <p className="movie-desc">
-            Uma jornada épica pelo espaço,
-            tempo e sobrevivência da humanidade.
+          <p>
+            Uma jornada épica pelo espaço e pelo tempo para salvar a humanidade.
           </p>
 
           <div className="movie-info">
             <span>⭐ 9.8</span>
             <span>🎬 Ficção Científica</span>
           </div>
-
         </div>
-
       </section>
 
-      {/* LISTA */}
-
       <section className="lista">
-
         <h2>🍿 Minha Watchlist</h2>
 
         <div className="cards">
-
           {tarefas.map((tarefa) => (
-
             <div className="card" key={tarefa.id}>
-
               <div className="card-banner"></div>
 
-              <div className="card-content">
+              <h3>{tarefa.title}</h3>
 
-                <h3>
-                  {tarefa.title}
-                </h3>
+              <p>🎞️ Adicionado à sua lista</p>
 
-                <p>
-                  🎬 Adicionado à sua lista
-                </p>
-
-                <button
-                  onClick={() => excluirTarefa(tarefa.id)}
-                >
-                  🗑️ Remover
-                </button>
-
-              </div>
-
+              <button
+                className="btn-remover"
+                onClick={() => excluirTarefa(tarefa.id)}
+              >
+                🗑️ Remover
+              </button>
             </div>
-
           ))}
-
         </div>
-
       </section>
-
     </div>
   );
 }
