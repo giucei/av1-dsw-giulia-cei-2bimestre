@@ -19,36 +19,32 @@ function App() {
 
   // CRIAR
   async function criarTarefa(e) {
-    alert("CLIQUEI NO BOTÃO");
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!descricao.trim()) {
-      alert("Digite um filme ou série!");
-      return;
+  if (!descricao.trim()) return;
+
+  try {
+    const resposta = await fetch("http://localhost:3000/tarefas", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        descricao: descricao,
+      }),
+    });
+
+    if (!resposta.ok) {
+      throw new Error("Erro ao criar tarefa");
     }
 
-    try {
-      const resposta = await fetch("http://localhost:3000/tarefas", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: descricao,
-          description: descricao,
-        }),
-      });
+    setDescricao("");
 
-      if (!resposta.ok) {
-        throw new Error("Erro ao criar tarefa");
-      }
-
-      setDescricao("");
-      await carregarTarefas();
-    } catch (erro) {
-      console.error("Erro ao criar:", erro);
-    }
+    await carregarTarefas();
+  } catch (erro) {
+    console.error("Erro ao criar:", erro);
   }
+}
 
   // EXCLUIR
   async function excluirTarefa(id) {
